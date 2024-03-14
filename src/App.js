@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import Chart from "react-apexcharts";
+import ChartComponent from "../src/components/Chart/Chart";
 import "./App.css";
+import fetchData from "../src/utils/api";
 
 const App = () => {
   const [requests, setRequests] = useState([]);
   const [hotelRequests, setHotelRequests] = useState({});
   const [chartOptions, setChartOptions] = useState({
     chart: {
-      type: "line", // Change type to 'line'
-
+      type: "line",
       toolbar: {
-        show: false, // Hide chart toolbar
+        show: false,
       },
     },
     xaxis: {
@@ -19,15 +18,15 @@ const App = () => {
     },
     yaxis: {
       labels: {
-        formatter: (value) => value.toFixed(0), // Format Y-axis labels as whole numbers
+        formatter: (value) => value.toFixed(0),
       },
-      tickAmount: 4, // Adjust the tick amount to show ticks from 0 to 8
-      tickPlacement: "between", // Place ticks between categories
-      min: 0, // Set minimum value of Y-axis
-      max: 8, // Set maximum value of Y-axis
+      tickAmount: 4,
+      tickPlacement: "between",
+      min: 0,
+      max: 8,
     },
     title: {
-      text: "Requests Per Hotel", // Title of the chart
+      text: "Requests Per Hotel",
       align: "center",
       margin: 10,
       style: {
@@ -51,18 +50,9 @@ const App = () => {
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          "https://checkinn.co/api/v1/int/requests"
-        );
-        setRequests(response.data.requests);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
+    fetchData().then((data) => {
+      setRequests(data);
+    });
   }, []);
 
   useEffect(() => {
@@ -89,19 +79,11 @@ const App = () => {
 
   return (
     <div className="center-content">
-      {" "}
-      <div>
-        <div className="chart-container">
-          <Chart
-            options={chartOptions}
-            series={[{ data: Object.values(hotelRequests) }]}
-            type="line" // Change type to 'line'
-            width="100%" // Set width of chart to 100%
-          />
-        </div>
-
-        <p className="total-req">Total Requests: {requests.length}</p>
-      </div>
+      <ChartComponent
+        options={chartOptions}
+        series={[{ data: Object.values(hotelRequests) }]}
+      />
+      <p className="total-req">Total Requests: {requests.length}</p>
     </div>
   );
 };
